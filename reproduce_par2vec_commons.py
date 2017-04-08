@@ -59,7 +59,7 @@ def dense_to_one_hot(labels_dense, num_classes):
 
 
 def get_labels():
-    with open('data/stanfordSentimentTreebank/small_sentiment_labels.txt', mode='r') as labels_file:
+    with open('data/stanfordSentimentTreebank/sentiment_labels.txt', mode='r') as labels_file:
         orig_labels = pd.read_csv(labels_file, delimiter='|', names=['phrases_ids', 'label_values'],
                                   header=0, encoding='utf8')
         orig_labels['encode_label'] = orig_labels.apply(lambda row: encode_label(row), axis=1)
@@ -69,11 +69,11 @@ def get_labels():
 
 
 def build_dictionary():
-    with open('data/stanfordSentimentTreebank/small_dictionary.txt', mode='r') as dict_file:
+    with open('data/stanfordSentimentTreebank/dictionary.txt', mode='r') as dict_file:
         phrases = pd.read_csv(dict_file, delimiter='|', names=['phrase', 'phrase_index'],
                               encoding='utf8')
         print len(phrases)
-        counts = phrases.phrase.apply(lambda x: pd.value_counts(word_tokenize(x))).sum(axis=0)
+        counts = count_words(phrases)
         max_vocab_size = min(VOCAB_SIZE - 2 + REMOVE_TOP_K_TERMS, counts.shape[0])
         print max_vocab_size
         counts.sort_values(inplace=True, ascending=False)
@@ -108,6 +108,19 @@ def build_dictionary():
                 data.extend([(docid, dictionary['__NULL__'])] * n_nulls)
 
         return dictionary, vocab_size, data, doclens
+
+
+def count_words(phrases):
+    count_dict = {}
+    for phrase in phrases.phrase:
+        words = pd.value_counts(word_tokenize(phrase))
+        for word, count in words.iteritems():
+            try:
+                count_dict[word] += count
+            except:
+                count_dict[word] = count
+
+    return pd.Series(count_dict)
 
 
 def get_text_window_center_positions(data):
