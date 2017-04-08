@@ -59,7 +59,7 @@ def dense_to_one_hot(labels_dense, num_classes):
 
 
 def get_labels():
-    with open('data/stanfordSentimentTreebank/sentiment_labels.txt', mode='r') as labels_file:
+    with open('data/sentiment_labels.txt', mode='r') as labels_file:
         orig_labels = pd.read_csv(labels_file, delimiter='|', names=['phrases_ids', 'label_values'],
                                   header=0, encoding='utf8')
         orig_labels['encode_label'] = orig_labels.apply(lambda row: encode_label(row), axis=1)
@@ -69,7 +69,7 @@ def get_labels():
 
 
 def build_dictionary():
-    with open('data/stanfordSentimentTreebank/dictionary.txt', mode='r') as dict_file:
+    with open('data/dictionary.txt', mode='r') as dict_file:
         phrases = pd.read_csv(dict_file, delimiter='|', names=['phrase', 'phrase_index'],
                               encoding='utf8')
         print len(phrases)
